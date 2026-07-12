@@ -5,6 +5,7 @@
 #include "Configuration.h"
 #include "Datastore.h"
 #include "Display_Graphic.h"
+#include "Display_TDisplayS3.h"
 #include "I18n.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
@@ -118,6 +119,9 @@ void setup()
     // Initialize Display
     ESP_LOGI(TAG, "Initializing Display...");
     Display.init(scheduler);
+#if defined(OPENDTU_LILYGO_T_DISPLAY_S3)
+    TDisplay.init();
+#endif
 
     // Initialize Single LEDs
     ESP_LOGI(TAG, "Initializing LEDs...");
@@ -134,4 +138,7 @@ void setup()
 void loop()
 {
     scheduler.execute();
+#if defined(OPENDTU_LILYGO_T_DISPLAY_S3)
+    TDisplay.loop();
+#endif
 }

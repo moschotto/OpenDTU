@@ -1,0 +1,31 @@
+[
+    {
+        "name": "LILYGO T-Display-S3 CMT2300A",
+        "links": [
+            { "name": "Datasheet", "url": "https://www.lilygo.cc/products/t-display-s3" }
+        ],
+        "nrf24": {
+            "miso": -1,
+            "mosi": -1,
+            "clk": -1,
+            "irq": -1,
+            "en": -1,
+            "cs": -1
+        },
+        "cmt": {
+            "sdio": 11,
+            "clk": 12,
+            "cs": 10,
+            "fcs": 13,
+            "gpio2": -1,
+            "gpio3": -1
+        },
+        "display": {
+            "type": 0,
+            "data": -1,
+            "clk": -1,
+            "cs": -1,
+            "reset": -1
+        }
+    }
+]
