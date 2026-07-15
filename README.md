@@ -1,3 +1,25 @@
+# OpenDTU LilyGo T-Display-S3 Dashboard Fork
+
+This fork/branch adds a modern dashboard experience for OpenDTU on the LilyGo T-Display-S3 ESP32-S3 display board.
+
+## Branch Documentation
+
+- Feature documentation: [README_LILYGO_T_DISPLAY_S3.md](README_LILYGO_T_DISPLAY_S3.md)
+- Fork repository: [moschotto/OpenDTU](https://github.com/moschotto/OpenDTU)
+- Feature branch: `feature/lilygo-t-display-s3`
+
+## Original OpenDTU Project
+
+This repository is forked from the official OpenDTU project:
+
+- Original repository: [tbnobody/OpenDTU](https://github.com/tbnobody/OpenDTU)
+- Original README: [github.com/tbnobody/OpenDTU#readme](https://github.com/tbnobody/OpenDTU#readme)
+- Official documentation: [OpenDTU docs](https://tbnobody.github.io/OpenDTU-docs/)
+
+The original OpenDTU README content is kept below for reference.
+
+---
+
 # OpenDTU
 
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
