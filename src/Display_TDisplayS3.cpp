@@ -43,6 +43,19 @@ constexpr int16_t StartupLogoSourceW = StartupLogoTargetW * StartupLogoScale;
 constexpr int16_t StartupLogoSourceH = StartupLogoTargetH * StartupLogoScale;
 constexpr uint32_t InverterWaitTimeoutMillis = 60U * 1000U;
 constexpr uint32_t InverterWaitFrameMillis = 85U;
+constexpr int16_t WaitPanelX = 22;
+constexpr int16_t WaitPanelY = 24;
+constexpr int16_t WaitPanelW = 276;
+constexpr int16_t WaitPanelH = 122;
+constexpr int16_t WaitBarX = 58;
+constexpr int16_t WaitBarY = 118;
+constexpr int16_t WaitBarW = 204;
+constexpr int16_t WaitBarH = 12;
+constexpr int16_t WaitBarSegmentW = 54;
+constexpr int16_t WaitDotsX = 132;
+constexpr int16_t WaitDotsY = 146;
+constexpr int16_t WaitDotsW = 58;
+constexpr int16_t WaitDotsH = 16;
 
 struct Theme {
     uint16_t background;
@@ -95,7 +108,11 @@ uint16_t ColorGlow = 0x36FF;
 
 TFT_eSPI _tft;
 TFT_eSprite* _renderSprite = nullptr;
+TFT_eSprite _waitBarSprite(&_tft);
+TFT_eSprite _waitDotsSprite(&_tft);
 bool _suppressPageDots = false;
+bool _waitBarSpriteReady = false;
+bool _waitDotsSpriteReady = false;
 
 struct RenderTarget {
     void useSprite(TFT_eSprite* sprite) { _renderSprite = sprite; }
@@ -1339,12 +1356,8 @@ void drawInverterWaitLayout()
     _gfx.setTextDatum(MC_DATUM);
     _gfx.fillScreen(ColorBackground);
 
-    const int16_t panelX = 22;
-    const int16_t panelY = 24;
-    const int16_t panelW = 276;
-    const int16_t panelH = 122;
-    _gfx.fillRoundRect(panelX, panelY, panelW, panelH, 10, ColorPanel);
-    _gfx.drawRoundRect(panelX, panelY, panelW, panelH, 10, ColorPanelBorder);
+    _gfx.fillRoundRect(WaitPanelX, WaitPanelY, WaitPanelW, WaitPanelH, 10, ColorPanel);
+    _gfx.drawRoundRect(WaitPanelX, WaitPanelY, WaitPanelW, WaitPanelH, 10, ColorPanelBorder);
 
     _gfx.setTextColor(ColorMuted, ColorPanel);
     drawBoldString("WAITING FOR", 160, 58, 2);
@@ -1352,57 +1365,54 @@ void drawInverterWaitLayout()
     drawBoldString("INVERTER DATA", 160, 88, 2);
     _gfx.setTextSize(1);
 
-    constexpr int16_t BarX = 58;
-    constexpr int16_t BarY = 118;
-    constexpr int16_t BarW = 204;
-    constexpr int16_t BarH = 12;
-    _gfx.fillRoundRect(BarX, BarY, BarW, BarH, 6, ColorInactive);
-    _gfx.drawRoundRect(BarX, BarY, BarW, BarH, 6, ColorPanelBorder);
+    _gfx.fillRoundRect(WaitBarX, WaitBarY, WaitBarW, WaitBarH, 6, ColorInactive);
+    _gfx.drawRoundRect(WaitBarX, WaitBarY, WaitBarW, WaitBarH, 6, ColorPanelBorder);
 }
 
-void drawInverterWaitAnimation(const uint8_t frame)
+bool ensureWaitAnimationSprites()
 {
-    constexpr int16_t SegmentW = 54;
-    constexpr int16_t BarX = 58;
-    constexpr int16_t BarY = 118;
-    constexpr int16_t BarW = 204;
-    constexpr int16_t BarH = 12;
-    const int16_t travel = BarW - SegmentW - 4;
+    if (!_waitBarSpriteReady) {
+        _waitBarSprite.setColorDepth(16);
+        _waitBarSpriteReady = _waitBarSprite.createSprite(WaitBarW, WaitBarH) != nullptr;
+    }
+
+    if (!_waitDotsSpriteReady) {
+        _waitDotsSprite.setColorDepth(16);
+        _waitDotsSpriteReady = _waitDotsSprite.createSprite(WaitDotsW, WaitDotsH) != nullptr;
+    }
+
+    return _waitBarSpriteReady && _waitDotsSpriteReady;
+}
+
+int16_t waitBarSegmentOffset(const uint8_t frame)
+{
+    const int16_t travel = WaitBarW - WaitBarSegmentW - 4;
     const uint8_t phase = frame % 36;
     const float normalized = phase < 18
         ? static_cast<float>(phase) / 17.0f
         : static_cast<float>(35 - phase) / 17.0f;
     const float eased = 0.5f - 0.5f * std::cos(normalized * static_cast<float>(M_PI));
-    const int16_t segmentX = BarX + 2 + static_cast<int16_t>(travel * eased);
+    return 2 + static_cast<int16_t>(travel * eased);
+}
 
-    TFT_eSprite barSprite(&_tft);
-    barSprite.setColorDepth(16);
-    if (barSprite.createSprite(BarW, BarH) != nullptr) {
-        barSprite.fillSprite(ColorPanel);
-        barSprite.fillRoundRect(0, 0, BarW, BarH, 6, ColorInactive);
-        barSprite.drawRoundRect(0, 0, BarW, BarH, 6, ColorPanelBorder);
-        barSprite.fillRoundRect(segmentX - BarX, 2, SegmentW, BarH - 4, 4, ColorBlue);
-        barSprite.pushSprite(BarX, BarY);
-        barSprite.deleteSprite();
+void drawInverterWaitAnimation(const uint8_t frame)
+{
+    if (!ensureWaitAnimationSprites()) {
+        return;
     }
 
-    constexpr int16_t DotsX = 132;
-    constexpr int16_t DotsY = 146;
-    constexpr int16_t DotsW = 58;
-    constexpr int16_t DotsH = 16;
-    TFT_eSprite dotsSprite(&_tft);
-    dotsSprite.setColorDepth(16);
-    if (dotsSprite.createSprite(DotsW, DotsH) != nullptr) {
-        dotsSprite.fillSprite(ColorBackground);
-        dotsSprite.setSwapBytes(false);
-        dotsSprite.fillRect(0, 0, DotsW, DotsH, ColorBackground);
-        for (uint8_t i = 0; i < 3; i++) {
-            const bool active = ((frame / 4) % 3) == i;
-            dotsSprite.fillCircle(10 + i * 18, 8, active ? 4 : 3, active ? ColorBlue : ColorInactive);
-        }
-        dotsSprite.pushSprite(DotsX, DotsY);
-        dotsSprite.deleteSprite();
+    _waitBarSprite.fillSprite(ColorPanel);
+    _waitBarSprite.fillRoundRect(0, 0, WaitBarW, WaitBarH, 6, ColorInactive);
+    _waitBarSprite.drawRoundRect(0, 0, WaitBarW, WaitBarH, 6, ColorPanelBorder);
+    _waitBarSprite.fillRoundRect(waitBarSegmentOffset(frame), 2, WaitBarSegmentW, WaitBarH - 4, 4, ColorBlue);
+    _waitBarSprite.pushSprite(WaitBarX, WaitBarY);
+
+    _waitDotsSprite.fillSprite(ColorBackground);
+    for (uint8_t i = 0; i < 3; i++) {
+        const bool active = ((frame / 4) % 3) == i;
+        _waitDotsSprite.fillCircle(10 + i * 18, 8, active ? 4 : 3, active ? ColorBlue : ColorInactive);
     }
+    _waitDotsSprite.pushSprite(WaitDotsX, WaitDotsY);
 }
 
 void drawInverterWaitScreen(const uint8_t frame)
