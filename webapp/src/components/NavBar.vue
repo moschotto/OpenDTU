@@ -144,6 +144,9 @@
                         <router-link @click="onClick" class="nav-link" to="/about">{{ $t('menu.About') }}</router-link>
                     </li>
                     <li class="flex-sm-fill"></li>
+                    <li class="nav-item me-2">
+                        <router-link @click="onClick" class="btn btn-outline-info" to="/modern">Modern</router-link>
+                    </li>
                     <ThemeSwitcher class="me-2" />
                     <form class="d-flex" role="search">
                         <LocaleSwitcher class="me-2" />

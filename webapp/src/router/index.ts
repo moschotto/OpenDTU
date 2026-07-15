@@ -9,6 +9,7 @@ import HomeView from '@/views/HomeView.vue';
 import InverterAdminView from '@/views/InverterAdminView.vue';
 import LoginView from '@/views/LoginView.vue';
 import MaintenanceRebootView from '@/views/MaintenanceRebootView.vue';
+import ModernView from '@/views/ModernView.vue';
 import LoggingAdminView from '@/views/LoggingAdminView.vue';
 import MqttAdminView from '@/views/MqttAdminView.vue';
 import MqttInfoView from '@/views/MqttInfoView.vue';
@@ -36,6 +37,11 @@ const router = createRouter({
             path: '/',
             name: 'Home',
             component: HomeView,
+        },
+        {
+            path: '/modern',
+            name: 'Modern Dashboard',
+            component: ModernView,
         },
         {
             path: '/login',
