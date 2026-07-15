@@ -43,6 +43,20 @@ The selected page and theme are saved and restored after reboot.
 
 ## Display Screens
 
+The following simulated screenshots show the current dashboard layout. They are generated from the UI design for documentation purposes and are not camera captures from the physical display.
+
+![LilyGo T-Display-S3 dashboard screens](docs/lilygo-t-display-s3/screenshots/dashboard-screens-overview.png)
+
+Individual screen images:
+
+- [Overview](docs/lilygo-t-display-s3/screenshots/01-overview.png)
+- [Solar - Power per Panel](docs/lilygo-t-display-s3/screenshots/02-panel-power.png)
+- [Power / History](docs/lilygo-t-display-s3/screenshots/03-power-history.png)
+- [Daily Yield](docs/lilygo-t-display-s3/screenshots/04-daily-yield.png)
+- [Energy / Stats](docs/lilygo-t-display-s3/screenshots/05-energy-stats.png)
+- [OpenDTU / Inverter](docs/lilygo-t-display-s3/screenshots/06-inverter.png)
+- [Network](docs/lilygo-t-display-s3/screenshots/07-network.png)
+
 ### 1. Overview
 
 Shows the most important live values:
@@ -192,4 +206,3 @@ ls /dev/cu.*
 - Savings and CO2 values are estimates derived from total generated energy.
 - The power history graph is held in RAM and starts fresh after reboot.
 - The dashboard relies on OpenDTU inverter fields being available; missing values are displayed as `--`.
-
