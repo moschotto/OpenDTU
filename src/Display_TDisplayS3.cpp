@@ -36,11 +36,10 @@ constexpr char YieldHistoryFilename[] = "/tdisplay_yield_history.bin";
 constexpr uint32_t DisplaySettingsMagic = 0x54445345;
 constexpr uint16_t DisplaySettingsVersion = 1;
 constexpr char DisplaySettingsFilename[] = "/tdisplay_settings.bin";
-constexpr int16_t StartupLogoTargetW = 300;
-constexpr int16_t StartupLogoTargetH = 58;
-constexpr int16_t StartupLogoScale = 2;
-constexpr int16_t StartupLogoSourceW = StartupLogoTargetW * StartupLogoScale;
-constexpr int16_t StartupLogoSourceH = StartupLogoTargetH * StartupLogoScale;
+constexpr int16_t StartupLogoTargetW = 316;
+constexpr int16_t StartupLogoTargetH = 72;
+constexpr int16_t StartupLogoSourceW = StartupLogoTargetW;
+constexpr int16_t StartupLogoSourceH = StartupLogoTargetH;
 constexpr uint32_t InverterWaitTimeoutMillis = 60U * 1000U;
 constexpr uint32_t InverterWaitFrameMillis = 85U;
 constexpr int16_t WaitPanelX = 22;
@@ -1251,70 +1250,45 @@ bool renderStartupLogoSprite(TFT_eSprite& sprite)
         return false;
     }
     sprite.fillSprite(ColorBackground);
-    sprite.setTextDatum(TL_DATUM);
-    sprite.setTextSize(StartupLogoScale * 2);
-    const int16_t openWidth = sprite.textWidth("Open", 4);
-    const int16_t dtuWidth = sprite.textWidth("DTU", 4);
-    const int16_t startX = std::max<int16_t>(0, (StartupLogoSourceW - openWidth - dtuWidth) / 2);
-    const int16_t startY = std::max<int16_t>(0, (StartupLogoSourceH - 54 * StartupLogoScale) / 2);
-    sprite.setTextColor(LogoText, ColorBackground);
-    sprite.drawString("Open", startX, startY, 4);
-    sprite.drawString("Open", startX + StartupLogoScale, startY, 4);
-    sprite.setTextColor(LogoBlue, ColorBackground);
-    sprite.drawString("DTU", startX + openWidth, startY, 4);
-    sprite.drawString("DTU", startX + openWidth + StartupLogoScale, startY, 4);
+    sprite.setFreeFont(&FreeSansBold24pt7b);
+    sprite.setTextDatum(ML_DATUM);
+    sprite.setTextSize(1);
+    constexpr char LogoTextValue[] = "OpenDTU";
+    constexpr uint8_t LogoTextLength = sizeof(LogoTextValue) - 1;
+    int16_t charWidths[LogoTextLength] = {};
+    int16_t totalCharWidth = 0;
+    for (uint8_t i = 0; i < LogoTextLength; i++) {
+        const char singleChar[] = {LogoTextValue[i], '\0'};
+        charWidths[i] = sprite.textWidth(singleChar);
+        totalCharWidth += charWidths[i];
+    }
+    constexpr int16_t DesiredLogoW = StartupLogoSourceW - 10;
+    const int16_t tracking = std::max<int16_t>(0, (DesiredLogoW - totalCharWidth) / (LogoTextLength - 1));
+    const int16_t logoWidth = totalCharWidth + tracking * (LogoTextLength - 1);
+    int16_t cursorX = std::max<int16_t>(0, (StartupLogoSourceW - logoWidth) / 2);
+    constexpr int16_t startY = StartupLogoSourceH / 2 + 3;
+    for (uint8_t i = 0; i < LogoTextLength; i++) {
+        const char singleChar[] = {LogoTextValue[i], '\0'};
+        sprite.setTextColor(i < 4 ? LogoText : LogoBlue, ColorBackground);
+        sprite.drawString(singleChar, cursorX, startY, 1);
+        cursorX += charWidths[i] + tracking;
+    }
+    sprite.setFreeFont(nullptr);
     sprite.setTextSize(1);
     return true;
 }
 
-uint16_t sampleLogoPixel(TFT_eSprite& logo, const int16_t sx0, const int16_t sx1, const int16_t sy0, const int16_t sy1)
+void drawScaledStartupLogo(TFT_eSprite& frame, TFT_eSprite& logo, const int16_t width, const int16_t height)
 {
-    for (int16_t y = sy0; y <= sy1; y++) {
-        for (int16_t x = sx0; x <= sx1; x++) {
-            const uint16_t color = logo.readPixel(std::min<int16_t>(x, StartupLogoSourceW - 1), std::min<int16_t>(y, StartupLogoSourceH - 1));
+    const int16_t targetX = (320 - width) / 2;
+    const int16_t targetY = (170 - height) / 2;
+    for (int16_t y = 0; y < height; y++) {
+        const int16_t sourceY = static_cast<int32_t>(y) * StartupLogoSourceH / height;
+        for (int16_t x = 0; x < width; x++) {
+            const int16_t sourceX = static_cast<int32_t>(x) * StartupLogoSourceW / width;
+            const uint16_t color = logo.readPixel(sourceX, sourceY);
             if (color != ColorBackground) {
-                return color;
-            }
-        }
-    }
-    return ColorBackground;
-}
-
-void drawScaledLogoToFrame(TFT_eSprite& frame, TFT_eSprite& logo, const int16_t centerX, const int16_t centerY, const uint8_t percent)
-{
-    const int16_t w = StartupLogoTargetW * percent / 100;
-    const int16_t h = StartupLogoTargetH * percent / 100;
-    const int16_t x0 = centerX - w / 2;
-    const int16_t y0 = centerY - h / 2;
-    for (int16_t y = 0; y < h; y++) {
-        const int16_t sy0 = y * StartupLogoSourceH / h;
-        const int16_t sy1 = ((y + 1) * StartupLogoSourceH - 1) / h;
-        for (int16_t x = 0; x < w; x++) {
-            const int16_t sx0 = x * StartupLogoSourceW / w;
-            const int16_t sx1 = ((x + 1) * StartupLogoSourceW - 1) / w;
-            const uint16_t color = sampleLogoPixel(logo, sx0, sx1, sy0, sy1);
-            if (color != ColorBackground) {
-                frame.drawPixel(x0 + x, y0 + y, color);
-            }
-        }
-    }
-}
-
-void drawScaledLogoToDisplay(TFT_eSprite& logo, const int16_t centerX, const int16_t centerY, const uint8_t percent)
-{
-    const int16_t w = StartupLogoTargetW * percent / 100;
-    const int16_t h = StartupLogoTargetH * percent / 100;
-    const int16_t x0 = centerX - w / 2;
-    const int16_t y0 = centerY - h / 2;
-    for (int16_t y = 0; y < h; y++) {
-        const int16_t sy0 = y * StartupLogoSourceH / h;
-        const int16_t sy1 = ((y + 1) * StartupLogoSourceH - 1) / h;
-        for (int16_t x = 0; x < w; x++) {
-            const int16_t sx0 = x * StartupLogoSourceW / w;
-            const int16_t sx1 = ((x + 1) * StartupLogoSourceW - 1) / w;
-            const uint16_t color = sampleLogoPixel(logo, sx0, sx1, sy0, sy1);
-            if (color != ColorBackground) {
-                _gfx.drawPixel(x0 + x, y0 + y, color);
+                frame.drawPixel(targetX + x, targetY + y, color);
             }
         }
     }
@@ -1322,29 +1296,39 @@ void drawScaledLogoToDisplay(TFT_eSprite& logo, const int16_t centerX, const int
 
 void showStartupScreen()
 {
-    constexpr uint8_t ZoomFrames = 18;
+    constexpr uint8_t ZoomFrames = 16;
     TFT_eSprite logoSprite(&_tft);
-    TFT_eSprite frameSprite(&_tft);
     if (!renderStartupLogoSprite(logoSprite)) {
         return;
     }
+
+    TFT_eSprite frameSprite(&_tft);
     frameSprite.setColorDepth(16);
-    const bool hasFrameSprite = frameSprite.createSprite(320, 170) != nullptr;
+    if (frameSprite.createSprite(320, 170) == nullptr) {
+        _gfx.fillScreen(ColorBackground);
+        logoSprite.pushSprite((320 - StartupLogoTargetW) / 2, (170 - StartupLogoTargetH) / 2);
+        delay(850);
+        logoSprite.deleteSprite();
+        return;
+    }
+
     _gfx.setTextPadding(0);
     _gfx.fillScreen(ColorBackground);
-    for (uint8_t frame = 0; frame < ZoomFrames; frame++) {
-        const uint8_t percent = 40 + static_cast<uint8_t>(60.0f * (1.0f - std::pow(1.0f - static_cast<float>(frame + 1) / ZoomFrames, 3.0f)));
-        if (hasFrameSprite) {
-            frameSprite.fillSprite(ColorBackground);
-            drawScaledLogoToFrame(frameSprite, logoSprite, 160, 85, percent);
-            frameSprite.pushSprite(0, 0);
-        } else {
-            _gfx.fillScreen(ColorBackground);
-            drawScaledLogoToDisplay(logoSprite, 160, 85, percent);
-        }
-        delay(42);
+    for (uint8_t frame = 0; frame <= ZoomFrames; frame++) {
+        const float step = static_cast<float>(frame) / ZoomFrames;
+        const float progress = 0.5f - 0.5f * std::cos(step * PI);
+        const float scale = 0.26f + (0.74f * progress);
+        const int16_t width = std::max<int16_t>(1, static_cast<int16_t>(StartupLogoTargetW * scale));
+        const int16_t height = std::max<int16_t>(1, static_cast<int16_t>(StartupLogoTargetH * scale));
+        frameSprite.fillSprite(ColorBackground);
+        drawScaledStartupLogo(frameSprite, logoSprite, width, height);
+        frameSprite.pushSprite(0, 0);
+        delay(34);
     }
-    delay(650);
+    frameSprite.fillSprite(ColorBackground);
+    logoSprite.pushToSprite(&frameSprite, (320 - StartupLogoTargetW) / 2, (170 - StartupLogoTargetH) / 2);
+    frameSprite.pushSprite(0, 0);
+    delay(700);
     frameSprite.deleteSprite();
     logoSprite.deleteSprite();
 }
@@ -1352,7 +1336,7 @@ void showStartupScreen()
 void drawInverterWaitLayout()
 {
     _gfx.setTextPadding(0);
-    _gfx.setTextSize(2);
+    _gfx.setTextSize(1);
     _gfx.setTextDatum(MC_DATUM);
     _gfx.fillScreen(ColorBackground);
 
@@ -1360,10 +1344,9 @@ void drawInverterWaitLayout()
     _gfx.drawRoundRect(WaitPanelX, WaitPanelY, WaitPanelW, WaitPanelH, 10, ColorPanelBorder);
 
     _gfx.setTextColor(ColorMuted, ColorPanel);
-    drawBoldString("WAITING FOR", 160, 58, 2);
+    drawBoldString("WAITING FOR", 160, 55, 2);
     _gfx.setTextColor(ColorText, ColorPanel);
-    drawBoldString("INVERTER DATA", 160, 88, 2);
-    _gfx.setTextSize(1);
+    drawBoldString("INVERTER DATA", 160, 92, 2);
 
     _gfx.fillRoundRect(WaitBarX, WaitBarY, WaitBarW, WaitBarH, 6, ColorInactive);
     _gfx.drawRoundRect(WaitBarX, WaitBarY, WaitBarW, WaitBarH, 6, ColorPanelBorder);
