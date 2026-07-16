@@ -42,13 +42,29 @@ This release follows the original OpenDTU license:
 
 ## Screenshots
 
-The following simulated screenshots show the current dashboard layout including boot, waiting, and dashboard screens.
+Current dashboard layout including boot, waiting, and dashboard screens.
+
+![LilyGo T-Display-S3 page slide demo](https://raw.githubusercontent.com/moschotto/OpenDTU/feature/lilygo-t-display-s3/docs/lilygo-t-display-s3/screenshots/dashboard-slide-demo.gif)
+
 
 ![LilyGo T-Display-S3 dashboard screens](https://raw.githubusercontent.com/moschotto/OpenDTU/feature/lilygo-t-display-s3/docs/lilygo-t-display-s3/screenshots/dashboard-screens-overview.png)
 
-Animated page transition demo:
+## Wiring
 
-![LilyGo T-Display-S3 page slide demo](https://raw.githubusercontent.com/moschotto/OpenDTU/feature/lilygo-t-display-s3/docs/lilygo-t-display-s3/screenshots/dashboard-slide-demo.gif)
+The LilyGo T-Display-S3 profile uses direct CMT2300A pads:
+
+![LilyGo T-Display-S3 CMT2300A wiring](https://raw.githubusercontent.com/moschotto/OpenDTU/feature/lilygo-t-display-s3/docs/lilygo-t-display-s3/wiring/lilygo-t-display-s3-cmt2300a-wiring.png)
+
+Connections:
+
+- `3V3` to `3.3V`
+- `GND` to `GND`
+- `GPIO10` to `CS`
+- `GPIO11` to `SDIO`
+- `GPIO12` to `CLK`
+- `GPIO13` to `FCS`
+
+Remove the jumper for SPI operation. Use 3.3 V only.
 
 ## Release Assets
 

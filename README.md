@@ -29,6 +29,25 @@ This fork follows the original OpenDTU license:
 - One Hoymiles inverter
 - Up to four DC panel/string channels
 
+## Wiring
+
+The LilyGo T-Display-S3 profile uses the CMT2300A radio module via direct CMT pads:
+
+![LilyGo T-Display-S3 CMT2300A wiring](docs/lilygo-t-display-s3/wiring/lilygo-t-display-s3-cmt2300a-wiring.png)
+
+Connections:
+
+| LilyGo T-Display-S3 | CMT2300A signal |
+| --- | --- |
+| 3V3 | 3.3V |
+| GND | GND |
+| GPIO10 | CS |
+| GPIO11 | SDIO |
+| GPIO12 | CLK |
+| GPIO13 | FCS |
+
+Remove the jumper for SPI operation. Use 3.3 V only.
+
 ## Inverter Compatibility
 
 This release keeps the original OpenDTU inverter support. In general, every inverter that works with the official OpenDTU firmware should also work with this fork, because the inverter communication, Web API, configuration, and core OpenDTU logic are inherited from the upstream project.
@@ -65,14 +84,14 @@ The added LilyGo display dashboard is visually optimized for one inverter and up
 
 The selected page and theme are saved and restored after reboot.
 
-## Display Screens
+## Screenshots
 
-The following simulated screenshots show the current dashboard layout including boot, waiting, and dashboard screens. They are generated from the UI design for documentation purposes and are not camera captures from the physical display.
+Current dashboard layout including boot, waiting, and dashboard screens.
 
-![LilyGo T-Display-S3 page slide demo](docs/lilygo-t-display-s3/screenshots/dashboard-slide-demo.gif)
+![LilyGo T-Display-S3 page slide demo](https://raw.githubusercontent.com/moschotto/OpenDTU/feature/lilygo-t-display-s3/docs/lilygo-t-display-s3/screenshots/dashboard-slide-demo.gif)
 
 
-![LilyGo T-Display-S3 dashboard screens](docs/lilygo-t-display-s3/screenshots/dashboard-screens-overview.png)
+![LilyGo T-Display-S3 dashboard screens](https://raw.githubusercontent.com/moschotto/OpenDTU/feature/lilygo-t-display-s3/docs/lilygo-t-display-s3/screenshots/dashboard-screens-overview.png)
 
 
 Individual screen images:
