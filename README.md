@@ -12,6 +12,14 @@ This repository is a fork of the official OpenDTU project:
 - Original README: [github.com/tbnobody/OpenDTU#readme](https://github.com/tbnobody/OpenDTU#readme)
 - Official documentation: [OpenDTU docs](https://tbnobody.github.io/OpenDTU-docs/)
 
+## License
+
+This fork follows the original OpenDTU license:
+
+- SPDX-License-Identifier: `GPL-2.0-or-later`
+- Full license text: [LICENSE](LICENSE)
+- Original license notice: [COPYING](COPYING)
+
 ## Hardware Target
 
 - LilyGo T-Display-S3
@@ -59,9 +67,13 @@ The selected page and theme are saved and restored after reboot.
 
 ## Display Screens
 
-The following simulated screenshots show the current dashboard layout. They are generated from the UI design for documentation purposes and are not camera captures from the physical display.
+The following simulated screenshots show the current dashboard layout including boot, waiting, and dashboard screens. They are generated from the UI design for documentation purposes and are not camera captures from the physical display.
+
+![LilyGo T-Display-S3 page slide demo](docs/lilygo-t-display-s3/screenshots/dashboard-slide-demo.gif)
+
 
 ![LilyGo T-Display-S3 dashboard screens](docs/lilygo-t-display-s3/screenshots/dashboard-screens-overview.png)
+
 
 Individual screen images:
 
@@ -195,6 +207,19 @@ The modern dashboard uses a dark, responsive layout with:
 - Modern typography and spacing
 
 ## Build and Upload
+
+## Flashing
+
+Use the same flashing approach as the original OpenDTU project. The LilyGo T-Display-S3 fork does not require a special flashing process.
+
+- ESP Web Flasher: [web.esphome.io](https://web.esphome.io/)
+- Original OpenDTU flashing documentation: [opendtu.solar/firmware/firmware](https://www.opendtu.solar/firmware/firmware/)
+
+Use `firmware.factory.bin` for a clean first installation or when flashing the ESP32-S3 from scratch. This is the recommended file for a first flash via ESP Web Flasher.
+
+Use `firmware.bin` when OpenDTU is already installed and you update through an existing OpenDTU-compatible setup, for example OpenDTU web update, OTA update, or PlatformIO upload to an already correctly partitioned device.
+
+## Local Build and Upload
 
 Build the LilyGo T-Display-S3 firmware with PlatformIO:
 

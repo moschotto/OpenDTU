@@ -1,10 +1,10 @@
-# LilyGo T-Display-S3 Dashboard v0.1.0
+# OpenDTU **LilyGo T-Display-S3 Dashboard** v1.0
 
 Initial public release of the OpenDTU LilyGo T-Display-S3 dashboard fork.
 
 This release is based on OpenDTU and adds a modern local display dashboard for the LilyGo T-Display-S3 / ESP32-S3 board, plus an optional modern web dashboard at `/modern`.
 
-## Highlights
+## Features
 
 - Modern seven-page dashboard for the 320 x 170 LilyGo T-Display-S3
 - Dark dashboard UI with rounded tiles, gauges, charts, and clean typography
@@ -32,18 +32,81 @@ For the full compatibility list, see the official OpenDTU inverter overview:
 
 https://www.opendtu.solar/hardware/inverter_overview/
 
+## License
+
+This release follows the original OpenDTU license:
+
+- SPDX-License-Identifier: `GPL-2.0-or-later`
+- Full license text: [LICENSE](https://github.com/moschotto/OpenDTU/blob/feature/lilygo-t-display-s3/LICENSE)
+- Original license notice: [COPYING](https://github.com/moschotto/OpenDTU/blob/feature/lilygo-t-display-s3/COPYING)
+
 ## Screenshots
 
+The following simulated screenshots show the current dashboard layout including boot, waiting, and dashboard screens.
+
 ![LilyGo T-Display-S3 dashboard screens](https://raw.githubusercontent.com/moschotto/OpenDTU/feature/lilygo-t-display-s3/docs/lilygo-t-display-s3/screenshots/dashboard-screens-overview.png)
+
+Animated page transition demo:
+
+![LilyGo T-Display-S3 page slide demo](https://raw.githubusercontent.com/moschotto/OpenDTU/feature/lilygo-t-display-s3/docs/lilygo-t-display-s3/screenshots/dashboard-slide-demo.gif)
 
 ## Release Assets
 
 The release includes firmware binaries for the `lilygo_t_display_s3` PlatformIO environment:
 
-- `firmware.bin` - application firmware image
-- `firmware.factory.bin` - combined factory image including bootloader, partition table, boot app, and firmware
+- `firmware.factory.bin`
+- `firmware.bin`
 
-## Flashing
+## Which Binary Should I Flash?
+
+Use the same flashing approach as the original OpenDTU project. The LilyGo T-Display-S3 fork does not require a special flashing process.
+
+### Fresh Install / First Flash
+
+Use `firmware.factory.bin` for a clean first installation or when flashing the ESP32-S3 from scratch.
+
+`firmware.factory.bin` is the combined factory image. It contains:
+
+- bootloader
+- partition table
+- boot app
+- OpenDTU application firmware
+
+This is the safest choice when the board is empty, freshly erased, has an unknown firmware state, or when you use the ESP Web Flasher for an initial installation.
+
+### Update an Existing OpenDTU Installation
+
+Use `firmware.bin` when OpenDTU is already installed and you update through an existing OpenDTU-compatible setup, for example:
+
+- OpenDTU web update
+- OTA update
+- PlatformIO upload to an already correctly partitioned device
+
+`firmware.bin` contains only the application firmware and assumes that bootloader and partition table are already present and compatible.
+
+### ESP Web Flasher
+
+For ESP Web Flasher usage, use a Chromium-based browser and open the ESP Web Tools flasher:
+
+https://web.esphome.io/
+
+Follow the original OpenDTU flashing documentation for the general flashing process. The flashing procedure is the same for this LilyGo T-Display-S3 release:
+
+https://www.opendtu.solar/firmware/firmware/
+
+The recommended file for a first flash via ESP Web Flasher is:
+
+```text
+firmware.factory.bin
+```
+
+If the device already runs OpenDTU and the web flasher/update tool explicitly expects an application image, use:
+
+```text
+firmware.bin
+```
+
+## Local Build and Upload
 
 Build locally:
 
@@ -61,6 +124,7 @@ Use the actual serial port of your board if it differs.
 
 ## Notes
 
+- Back up your OpenDTU configuration before replacing an existing installation.
 - The display UI is currently tailored for one inverter.
 - The display panel screen is fixed to four PV channels.
 - The daily yield history starts empty after first flash or filesystem reset.
