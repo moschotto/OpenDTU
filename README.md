@@ -21,6 +21,14 @@ This repository is a fork of the official OpenDTU project:
 - One Hoymiles inverter
 - Up to four DC panel/string channels
 
+## Inverter Compatibility
+
+This release keeps the original OpenDTU inverter support. In general, every inverter that works with the official OpenDTU firmware should also work with this fork, because the inverter communication, Web API, configuration, and core OpenDTU logic are inherited from the upstream project.
+
+The added LilyGo display dashboard is visually optimized for one inverter and up to four DC panel/string channels. Inverters with fewer channels still work; unused panel positions are shown as empty or zero-value channels on the display dashboard. For the complete and current inverter compatibility list, refer to the official OpenDTU documentation:
+
+- [OpenDTU inverter overview](https://www.opendtu.solar/hardware/inverter_overview/)
+
 ## Main Features
 
 - Seven-page dashboard optimized for the 320 x 170 display
